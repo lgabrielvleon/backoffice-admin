@@ -3,6 +3,24 @@ import ReactDOM from 'react-dom';
 import './index.css';
 import App from './App';
 import reportWebVitals from './reportWebVitals';
+import {environment} from './environments/environments';
+import Amplify from '@aws-amplify/core';
+console.info(environment.cognito)
+Amplify.configure({
+  Auth:{
+    identityPoolId: environment.cognito.identityPool,
+    region: environment.region,
+    userPoolId: environment.cognito.userPool,
+    userPoolWebClientId: environment.cognito.clientId,
+    mandatorySingIn: true,
+    oauth:{
+      domain: environment.cognito.appDomain,
+      redirectSignIn: window.location.origin+'/test',
+      redirectSignOut: window.location.origin+'/',
+      responseType: environment.cognito.responseType
+    }
+  }
+})
 
 ReactDOM.render(
   <React.StrictMode>
