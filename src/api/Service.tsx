@@ -86,6 +86,21 @@ class Service {
             console.error('Error en: ', error);
         }
     }
+
+    async deleteService(
+        id: string,
+    ): Promise<void> {
+        const key: string = environment.apiKey;
+        const url: string = environment.api.msSharedServices.deleteService + id;
+        try{
+            await fetch(url,{
+                headers: { "content-type": "application/json", "x-api-key": key},
+                method: "DELETE"
+            })
+        }catch (error) {
+            console.error(error);
+        }
+    }
 }
 
 export const service = new Service();

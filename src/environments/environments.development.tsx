@@ -11,7 +11,8 @@ export const environment = {
     api:{
         msSharedServices: {
             getServices: "https://l9igl2khu4.execute-api.eu-west-3.amazonaws.com/dev/api/data/service",
-            updateService: "https://l9igl2khu4.execute-api.eu-west-3.amazonaws.com/dev/api/data/service/"
+            updateService: "https://l9igl2khu4.execute-api.eu-west-3.amazonaws.com/dev/api/data/service/",
+            deleteService: "https://l9igl2khu4.execute-api.eu-west-3.amazonaws.com/dev/api/data/service/"
         }
     }
 }

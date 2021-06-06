@@ -1,8 +1,8 @@
 import { Backdrop, CircularProgress, createStyles, IconButton, makeStyles, Paper, Table, TableBody, TableCell, TableContainer, TableHead, TablePagination, TableRow, Theme, Typography, withStyles } from '@material-ui/core';
 import { Delete, Edit } from '@material-ui/icons';
-import React, { FC, useEffect, useState } from 'react';
+import React, { FC, useEffect } from 'react';
 import { service } from '../api/Service';
-import { ServiceListResponse } from '../types/Service';
+import { Service, ServiceListResponse } from '../types/Service';
 
 const StyledTableCell = withStyles((theme: Theme) =>
     createStyles({
@@ -29,12 +29,18 @@ const useStyles = makeStyles((theme: Theme) => ({
     }
 }))
 
-const ServicesTable: FC = () => {
+interface ServiceTableProps {
+    onEditService: (serice: Service) => void;
+    onDeleteService: (id: string) => void;
+    serviceListState: [boolean, (value: boolean) => void];
+}
+
+const ServicesTable: FC<ServiceTableProps> = ({ onEditService, onDeleteService, serviceListState }) => {
     const classes = useStyles();
-    const [services, setservices] = useState<ServiceListResponse[]>([]);
-    const [serviceListUpdate, setserviceListUpdate] = useState(false)
-    const [page, setpage] = useState(0);
-    const [rowsPerPage, setrowsPerPage] = useState(20);
+    const [services, setservices] = React.useState<ServiceListResponse[]>([]);
+    const [serviceListUpdate, setserviceListUpdate] = serviceListState;
+    const [page, setpage] = React.useState(0);
+    const [rowsPerPage, setrowsPerPage] = React.useState(20);
     const [loader, setloader] = React.useState(false);
 
     const handleChangePage = (event: unknown, newPage: number) => {
@@ -50,19 +56,23 @@ const ServicesTable: FC = () => {
         const getServices = async () => {
             await service.getServices().then(data => setservices(data));
         }
-        setloader(true)
-        getServices()
-        setserviceListUpdate(false)
-
-        setloader(false)
+        if (serviceListUpdate) {
+            setloader(true)
+            getServices()
+            setserviceListUpdate(false)
+            setloader(false)
+        }
+        
+        // eslint-disable-next-line react-hooks/exhaustive-deps
     }, [serviceListUpdate])
+
 
     return (
         <>
             <Paper className={classes.paper}>
-                <Typography component="h2" variant="h6" color="primary" gutterBottom>
+                <Typography component="h2" variant="h4" color="primary" gutterBottom>
                     Services
-            </Typography>
+                </Typography>
                 <TableContainer>
                     <Table stickyHeader aria-label="sticky table">
                         <TableHead>
@@ -81,8 +91,8 @@ const ServicesTable: FC = () => {
                                         <TableCell>{service.price}</TableCell>
                                         <TableCell>{service.unit}</TableCell>
                                         <TableCell align="center">
-                                            <IconButton><Edit /></IconButton>
-                                            <IconButton><Delete /></IconButton>
+                                            <IconButton><Edit onClick={() => onEditService(service)} /></IconButton>
+                                            <IconButton><Delete onClick={() => onDeleteService(service.id)} /></IconButton>
                                         </TableCell>
                                     </TableRow>
                                 )

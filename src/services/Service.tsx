@@ -16,49 +16,91 @@ const useStyles = makeStyles((theme: Theme) => ({
         position: 'absolute',
         bottom: theme.spacing(4),
         right: theme.spacing(4),
-    }, 
+    },
 }))
 
 interface ServiceProps {
     loaderState: (value: boolean) => void;
 }
 
-const Service: FC<ServiceProps> = ({loaderState}) => {
+const Service: FC<ServiceProps> = ({ loaderState }) => {
     const classes = useStyles();
     const [formOpen, setOpenform] = React.useState(false)
-    const handleOpenForm = () => {
-        setOpenform(true)
-    }
-    const initialValuesAddService: ServiceType = { unit: '', action: '', condition: '', name: '', price: 0, service: '' }
+    const [serviceListUpdate, setserviceListUpdate] = React.useState(false);
+    const [formAdd, setformAdd] = React.useState(false)
+    const [objService, setobjService] = React.useState({ unit: '', action: '', condition: '', name: '', price: 0, service: '' })
 
-    const handleNewCustomer = async (values: ServiceType) => {
-            loaderState(true)
-            var list: Array<ServiceType> = []
-            list.push(values)
-            await service.createService(list)
-            loaderState(false)
+    const onSubmitForm = async (service: ServiceType) => {
+        if (formAdd) {
+            await onSubmitAdd(service);
+        } else {
+            await onSubmitEdit(service);
+        }
     }
+
+    const onSubmitAdd = async (values: ServiceType) => {
+        loaderState(true)
+        var list: Array<ServiceType> = [];
+        list.push(values);
+        await service.createService(list);
+        setserviceListUpdate(true);
+        loaderState(false);
+    }
+
+    const onSubmitEdit = async (values: ServiceType) => {
+        loaderState(true);
+        await service.updateService(values);
+        setserviceListUpdate(true);
+        loaderState(false);
+    }
+
+    const onSubmitDelete = async (id: string) => {
+        loaderState(true);
+        console.info(id);
+        await service.deleteService(id);
+        setserviceListUpdate(true);
+        loaderState(false);
+    }
+
+    const handleEditService = (service: ServiceType) => {
+        setobjService(service);
+        setOpenform(true);
+        setformAdd(false);
+    }
+
+    const handleAddService = () => {
+        setOpenform(true);
+        setformAdd(true);
+    }
+
+
     return (
         <>
             <Container maxWidth="lg" className={classes.container}>
                 <Grid container spacing={3}>
                     <Grid item xs={12}>
-                        <ServicesTable />
+                        <ServicesTable
+                            onEditService={handleEditService}
+                            onDeleteService={onSubmitDelete}
+                            serviceListState={[serviceListUpdate, setserviceListUpdate]}
+                        />
                     </Grid>
                 </Grid>
                 <Box pt={4}>
                     <Copyright />
                 </Box>
             </Container>
-            <Fab color="secondary" aria-label="add" className={classes.fab} onClick={handleOpenForm}>
+            <Fab color="secondary" aria-label="add" className={classes.fab} onClick={handleAddService}>
                 <Add />
             </Fab>
 
             <ServiceForm
-                initialValues={initialValuesAddService}
-                onSubmit={handleNewCustomer}
+                formAdd={formAdd}
+                serviceState={[objService, setobjService]}
+                onSubmit={onSubmitForm}
                 openState={[formOpen, setOpenform]}
             />
+
         </>
     )
 }
