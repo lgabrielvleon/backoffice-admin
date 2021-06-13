@@ -1,7 +1,8 @@
 import { Backdrop, CircularProgress, makeStyles, Theme } from '@material-ui/core';
 import React, {FC} from 'react';
+import { BrowserRouter } from 'react-router-dom';
 import DrawerLeft from '../components/DrawerLeft';
-import Service from '../services/Service';
+import RouterConfig from '../components/RouterConfig';
 import NavBar from './../components/NavBar'
 
 const useStyles = makeStyles((theme: Theme) => ({
@@ -36,9 +37,9 @@ const Dashboard: FC = () => {
             />
             <main className={classes.content}>
                 <div className={classes.appBarSpacer} />
-                <Service
-                    loaderState={setloader}
-                />
+                <BrowserRouter>
+                    <RouterConfig/>
+                </BrowserRouter>
             </main>
 
             <Backdrop className={classes.backdrop} open={loader} onClick={() => { setloader(false) }}>
